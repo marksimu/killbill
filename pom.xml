@@ -25,7 +25,7 @@
         <version>0.144.64</version>
     </parent>
     <artifactId>killbill</artifactId>
-    <version>0.22.27</version>
+    <version>0.22.27.1</version>
     <packaging>pom</packaging>
     <name>killbill</name>
     <description>Library for managing recurring subscriptions and the associated billing</description>
@@ -48,16 +48,16 @@
         <module>currency</module>
         <module>profiles</module>
     </modules>
-    <scm>
-        <connection>scm:git:git://github.com/killbill/killbill.git</connection>
-        <developerConnection>scm:git:git@github.com:killbill/killbill.git</developerConnection>
-        <tag>killbill-0.22.27</tag>
-        <url>http://github.com/killbill/killbill/tree/master</url>
-    </scm>
-    <issueManagement>
-        <system>Github</system>
-        <url>http://github.com/killbill/killbill</url>
-    </issueManagement>
+    <distributionManagement>
+        <repository>
+            <id>releases</id>
+            <url>https://nexus.build.rocketlawyer.net/nexus/content/repositories/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <url>https://nexus.build.rocketlawyer.net/nexus/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
     <properties>
         <check.spotbugs-exclude-filter-file>${main.basedir}/spotbugs-exclude.xml</check.spotbugs-exclude-filter-file>
         <killbill.version>${project.version}</killbill.version>
@@ -86,4 +86,14 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+    <repositories>
+        <repository>
+            <id>releases</id>
+            <url>https://nexus.build.rocketlawyer.net/nexus/content/repositories/releases</url>
+        </repository>
+        <repository>
+            <id>snapshots</id>
+            <url>https://nexus.build.rocketlawyer.net/nexus/content/repositories/snapshots</url>
+        </repository>
+    </repositories>
 </project>
