@@ -22,8 +22,10 @@ import org.joda.time.DateTime;
 import org.killbill.notificationq.DefaultUUIDNotificationKey;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class NextBillingDateNotificationKey extends DefaultUUIDNotificationKey {
 
     private Boolean isDryRunForInvoiceNotification;

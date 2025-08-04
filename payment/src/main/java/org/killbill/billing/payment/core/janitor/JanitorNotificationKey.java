@@ -22,8 +22,10 @@ import java.util.UUID;
 import org.killbill.notificationq.DefaultUUIDNotificationKey;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class JanitorNotificationKey extends DefaultUUIDNotificationKey {
 
     private final Integer attemptNumber;

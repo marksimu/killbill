@@ -136,7 +136,7 @@ public class EhCacheCatalogCache implements CatalogCache {
             final VersionedPluginCatalog pluginCatalog = plugin.getVersionedPluginCatalog(ImmutableList.<PluginProperty>of(), tenantContext);
             // First plugin that gets something (for that tenant) returns it
             if (pluginCatalog != null) {
-                logger.info("Returning catalog from plugin {} on tenant {} ", service, internalTenantContext.getTenantRecordId());
+                logger.debug("Returning catalog from plugin {} on tenant {} ", service, internalTenantContext.getTenantRecordId());
                 return versionedCatalogMapper.toVersionedCatalog(pluginCatalog, internalTenantContext);
             }
         }
