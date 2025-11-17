@@ -57,7 +57,6 @@ select
 , host
 , session_data
 from sessions
-order by record_id asc
-limit 100
+limit 1000
 ;
 >>
