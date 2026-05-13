@@ -48,6 +48,7 @@ import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -69,7 +70,6 @@ import com.google.common.io.ByteStreams;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-import com.sun.jersey.api.representation.Form;
 import io.swagger.annotations.Api;
 
 @Singleton
@@ -168,7 +168,7 @@ public class PluginResource extends JaxRsResourceBase {
     private Response serviceViaOSGIPlugin(final HttpServletRequest request, final HttpServletResponse response,
                                           final ServletContext servletContext, final ServletConfig servletConfig,
                                           final UriInfo uriInfo) throws ServletException, IOException {
-        return serviceViaOSGIPlugin(request, request.getInputStream(), new Form(), response, servletContext, servletConfig, uriInfo);
+        return serviceViaOSGIPlugin(request, request.getInputStream(), new MultivaluedHashMap<>(), response, servletContext, servletConfig, uriInfo);
     }
 
     private Response serviceViaOSGIPlugin(final MultivaluedMap<String, String> form,

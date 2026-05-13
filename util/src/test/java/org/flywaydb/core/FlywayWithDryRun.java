@@ -46,7 +46,6 @@ public class FlywayWithDryRun extends Flyway {
                                                                                 getPlaceholderSuffix());
         return execute(new Command<Integer>() {
             public Integer execute(final Connection connectionMetaDataTable,
-                                   final Connection connectionUserObjects,
                                    final MigrationResolver migrationResolver,
                                    final MetaDataTable metaDataTable,
                                    final DbSupport dbSupport,
@@ -59,7 +58,7 @@ public class FlywayWithDryRun extends Flyway {
                                                                               getEncoding(),
                                                                               metaDataDBTable,
                                                                               connectionMetaDataTable,
-                                                                              connectionUserObjects,
+                                                                              null,
                                                                               dbSupport,
                                                                               metaDataTable,
                                                                               schemas[0],
@@ -68,7 +67,8 @@ public class FlywayWithDryRun extends Flyway {
                                                                               isIgnoreFutureMigrations(),
                                                                               false,
                                                                               isOutOfOrder(),
-                                                                              flywayCallbacks);
+                                                                              flywayCallbacks,
+                                                                              null);
                 return dbMigrate.dryRunMigrate();
             }
         });

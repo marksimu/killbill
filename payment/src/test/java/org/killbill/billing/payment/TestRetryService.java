@@ -19,6 +19,7 @@
 package org.killbill.billing.payment;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -26,7 +27,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
-import org.awaitility.Duration;
 import org.joda.time.LocalDate;
 import org.killbill.billing.account.api.Account;
 import org.killbill.billing.catalog.api.Currency;
@@ -63,7 +63,7 @@ public class TestRetryService extends PaymentTestSuiteNoDB {
     public void beforeMethod() throws Exception {
         super.beforeMethod();
 
-        setDefaultPollInterval(Duration.ONE_HUNDRED_MILLISECONDS);
+        setDefaultPollInterval(Duration.ofMillis(100));
 
         mockPaymentProviderPlugin = (MockPaymentProviderPlugin) registry.getServiceForName(MockPaymentProviderPlugin.PLUGIN_NAME);
         mockPaymentProviderPlugin.clear();

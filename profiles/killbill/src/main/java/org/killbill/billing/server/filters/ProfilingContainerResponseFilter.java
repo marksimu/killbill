@@ -17,8 +17,16 @@
 
 package org.killbill.billing.server.filters;
 
+import java.io.IOException;
 import java.util.List;
 
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
+
+import org.glassfish.jersey.server.ContainerRequest;
+import org.glassfish.jersey.server.ContainerResponse;
 import org.killbill.billing.jaxrs.json.ProfilingDataJson;
 import org.killbill.billing.util.jackson.ObjectMapper;
 import org.killbill.commons.profiling.Profiling;
@@ -30,10 +38,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.inject.Singleton;
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerRequestFilter;
-import com.sun.jersey.spi.container.ContainerResponse;
-import com.sun.jersey.spi.container.ContainerResponseFilter;
 
 @Singleton
 public class ProfilingContainerResponseFilter implements ContainerRequestFilter, ContainerResponseFilter {
@@ -50,39 +54,38 @@ public class ProfilingContainerResponseFilter implements ContainerRequestFilter,
     }
 
     @Override
-    public ContainerRequest filter(final ContainerRequest request) {
+    public void filter(final ContainerRequestContext request) throws IOException {
 
-        final List<String> profilingHeaderRequests = request.getRequestHeader(PROFILING_HEADER_REQ);
-        final String profilingHeaderRequest = (profilingHeaderRequests == null || profilingHeaderRequests.isEmpty()) ? null : profilingHeaderRequests.get(0);
+        final String profilingHeaderRequests = request.getHeaderString(PROFILING_HEADER_REQ);
+        final String profilingHeaderRequest = (profilingHeaderRequests == null || profilingHeaderRequests.isEmpty()) ? null : profilingHeaderRequests;
         if (profilingHeaderRequest != null) {
             try {
                 Profiling.setPerThreadProfilingData(profilingHeaderRequest);
                 // If we need to profile JAXRS let's do it...
                 final ProfilingData profilingData = Profiling.getPerThreadProfilingData();
                 if (profilingData.getProfileFeature().isProfilingJAXRS()) {
-                    profilingData.addStart(ProfilingFeatureType.JAXRS, request.getPath());
+                    profilingData.addStart(ProfilingFeatureType.JAXRS, request.getUriInfo().getPath());
                 }
             } catch (IllegalArgumentException e) {
                 log.info("Profiling data output {} is not supported, profiling NOT enabled", profilingHeaderRequest);
             }
         }
-        return request;
     }
 
     @Override
-    public ContainerResponse filter(final ContainerRequest request, final ContainerResponse response) {
+    public void filter(final ContainerRequestContext request, final ContainerResponseContext response) throws IOException {
         try {
             final ProfilingData rawData = Profiling.getPerThreadProfilingData();
             if (rawData != null) {
                 if (rawData.getProfileFeature().isProfilingJAXRS()) {
-                    rawData.addEnd(ProfilingFeatureType.JAXRS, request.getPath());
+                    rawData.addEnd(ProfilingFeatureType.JAXRS, request.getUriInfo().getPath());
                 }
                 final ProfilingDataJson profilingData = new ProfilingDataJson(rawData);
 
                 final String value;
                 try {
                     value = mapper.writeValueAsString(profilingData);
-                    response.getHttpHeaders().add(PROFILING_HEADER_RESP, value);
+                    response.getHeaders().add(PROFILING_HEADER_RESP, value);
                 } catch (JsonProcessingException e) {
                     throw new RuntimeException(e);
                 }
@@ -90,6 +93,5 @@ public class ProfilingContainerResponseFilter implements ContainerRequestFilter,
         } finally {
             Profiling.resetPerThreadProfilingData();
         }
-        return response;
     }
 }

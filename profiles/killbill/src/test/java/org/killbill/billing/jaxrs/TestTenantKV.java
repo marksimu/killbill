@@ -18,6 +18,7 @@
 package org.killbill.billing.jaxrs;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -44,7 +45,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
 import org.awaitility.Awaitility;
-import org.awaitility.Duration;
 
 public class TestTenantKV extends TestJaxrsBase {
 
@@ -121,7 +121,7 @@ public class TestTenantKV extends TestJaxrsBase {
         final AtomicReference<Payment> voidPaymentOtherTenant2Ref = new AtomicReference<Payment>();
         Awaitility.await()
                   .atMost(8, TimeUnit.SECONDS)
-                  .pollInterval(Duration.TWO_SECONDS)
+                  .pollInterval(Duration.ofSeconds(2))
                   .until(new Callable<Boolean>() {
                       @Override
                       public Boolean call() throws Exception {

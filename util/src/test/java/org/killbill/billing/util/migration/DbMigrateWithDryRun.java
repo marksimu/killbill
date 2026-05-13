@@ -20,11 +20,13 @@ package org.killbill.billing.util.migration;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.flywaydb.core.api.FlywayException;
 import org.flywaydb.core.api.MigrationInfo;
 import org.flywaydb.core.api.MigrationVersion;
 import org.flywaydb.core.api.callback.FlywayCallback;
+import org.flywaydb.core.api.configuration.FlywayConfiguration;
 import org.flywaydb.core.api.resolver.MigrationExecutor;
 import org.flywaydb.core.api.resolver.MigrationResolver;
 import org.flywaydb.core.internal.command.DbMigrate;
@@ -38,7 +40,6 @@ import org.flywaydb.core.internal.info.MigrationInfoServiceImpl;
 import org.flywaydb.core.internal.metadatatable.AppliedMigration;
 import org.flywaydb.core.internal.metadatatable.MetaDataTable;
 import org.flywaydb.core.internal.util.PlaceholderReplacer;
-import org.flywaydb.core.internal.util.jdbc.TransactionCallback;
 import org.flywaydb.core.internal.util.jdbc.TransactionTemplate;
 import org.flywaydb.core.internal.util.logging.Log;
 import org.flywaydb.core.internal.util.logging.LogFactory;
@@ -93,8 +94,9 @@ public class DbMigrateWithDryRun extends DbMigrate {
                                final boolean ignoreFutureMigrations,
                                final boolean ignoreFailedFutureMigration,
                                final boolean outOfOrder,
-                               final FlywayCallback[] callbacks) {
-        super(connectionMetaDataTable, connectionUserObjects, dbSupport, metaDataTable, schema, migrationResolver, target, ignoreFutureMigrations, ignoreFailedFutureMigration, outOfOrder, callbacks);
+                               final FlywayCallback[] callbacks,
+                               final FlywayConfiguration configuration) {
+        super(connectionUserObjects, dbSupport, metaDataTable, schema, migrationResolver, ignoreFailedFutureMigration, configuration);
         this.sqlStatements = sqlStatements;
         this.placeholderReplacer = placeholderReplacer;
         this.encoding = encoding;
@@ -116,9 +118,9 @@ public class DbMigrateWithDryRun extends DbMigrate {
     public int dryRunMigrate() throws FlywayException {
         try {
             for (final FlywayCallback callback : callbacks) {
-                new TransactionTemplate(connectionUserObjects).execute(new TransactionCallback<Object>() {
+                new TransactionTemplate(connectionUserObjects).execute(new Callable<Object>() {
                     @Override
-                    public Object doInTransaction() throws SQLException {
+                    public Object call() throws SQLException {
                         dbSupportUserObjects.changeCurrentSchemaTo(schema);
                         callback.beforeMigrate(connectionUserObjects);
                         return null;
@@ -127,12 +129,12 @@ public class DbMigrateWithDryRun extends DbMigrate {
             }
 
             // PIERRE: perform a single query to the metadata table
-            final MigrationInfoServiceImpl infoService = new MigrationInfoServiceImpl(migrationResolver, metaDataTableForDryRun, target, outOfOrder, true, true);
+            final MigrationInfoServiceImpl infoService = new MigrationInfoServiceImpl(migrationResolver, metaDataTableForDryRun, target, outOfOrder, true, true, true);
             infoService.refresh();
 
             final MigrationInfoImpl[] pendingMigrations = infoService.pending();
-            new TransactionTemplate(connectionMetaDataTable, false).execute(new TransactionCallback<Boolean>() {
-                public Boolean doInTransaction() {
+            new TransactionTemplate(connectionMetaDataTable, false).execute(new Callable<Boolean>() {
+                public Boolean call() {
                     int i = 1;
                     for (final MigrationInfoImpl migrationInfo : pendingMigrations) {
                         applyMigration(i, migrationInfo);
@@ -144,9 +146,9 @@ public class DbMigrateWithDryRun extends DbMigrate {
             });
 
             for (final FlywayCallback callback : callbacks) {
-                new TransactionTemplate(connectionUserObjects).execute(new TransactionCallback<Object>() {
+                new TransactionTemplate(connectionUserObjects).execute(new Callable<Object>() {
                     @Override
-                    public Object doInTransaction() throws SQLException {
+                    public Object call() throws SQLException {
                         dbSupportUserObjects.changeCurrentSchemaTo(schema);
                         callback.afterMigrate(connectionUserObjects);
                         return null;

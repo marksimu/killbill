@@ -234,7 +234,7 @@ public class DefaultInvoiceFormatter implements InvoiceFormatter {
 
         final DecimalFormat numberFormatter = (DecimalFormat) DecimalFormat.getCurrencyInstance(locale);
         final DecimalFormatSymbols dfs = numberFormatter.getDecimalFormatSymbols();
-        dfs.setInternationalCurrencySymbol(currencyUnit.getCurrencyCode());
+        dfs.setInternationalCurrencySymbol(currencyUnit.getCode());
 
         try {
             Currency currency = Currency.fromCode(invoiceCurrencyCode);
@@ -244,8 +244,8 @@ public class DefaultInvoiceFormatter implements InvoiceFormatter {
         }
 
         numberFormatter.setDecimalFormatSymbols(dfs);
-        numberFormatter.setMinimumFractionDigits(currencyUnit.getDefaultFractionDigits());
-        numberFormatter.setMaximumFractionDigits(currencyUnit.getDefaultFractionDigits());
+        numberFormatter.setMinimumFractionDigits(currencyUnit.getDecimalPlaces());
+        numberFormatter.setMaximumFractionDigits(currencyUnit.getDecimalPlaces());
 
         return numberFormatter.format(amount.doubleValue());
     }

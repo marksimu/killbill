@@ -23,6 +23,7 @@ import java.net.URISyntaxException;
 
 import javax.servlet.ServletContext;
 
+import org.glassfish.jersey.message.GZipEncoder;
 import org.killbill.billing.jaxrs.resources.JaxRsResourceBase;
 import org.killbill.billing.jaxrs.util.KillbillEventHandler;
 import org.killbill.billing.platform.api.KillbillConfigSource;
@@ -42,7 +43,6 @@ import ch.qos.logback.classic.helpers.MDCInsertingServletFilter;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Module;
 import com.google.inject.servlet.ServletModule;
-import com.sun.jersey.api.container.filter.GZIPContentEncodingFilter;
 import io.swagger.jaxrs.config.BeanConfig;
 
 public class KillbillGuiceListener extends KillbillPlatformGuiceListener {
@@ -81,7 +81,7 @@ public class KillbillGuiceListener extends KillbillPlatformGuiceListener {
         // must not be set to false.
         if (config.isConfiguredToReturnGZIPResponses()) {
             logger.info("Enable http gzip responses");
-            builder.addJerseyFilter(GZIPContentEncodingFilter.class.getName());
+            builder.addJerseyFilter(GZipEncoder.class.getName());
         }
         builder.addJerseyFilter(ProfilingContainerResponseFilter.class.getName());
 

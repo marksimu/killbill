@@ -17,6 +17,7 @@
 
 package org.killbill.billing.jaxrs;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -37,7 +38,6 @@ import org.testng.annotations.Test;
 
 import com.google.inject.Inject;
 import org.awaitility.Awaitility;
-import org.awaitility.Duration;
 
 public class TestPerTenantConfig extends TestJaxrsBase {
 
@@ -100,7 +100,7 @@ public class TestPerTenantConfig extends TestJaxrsBase {
 
         Awaitility.await()
                   .atMost(4, TimeUnit.SECONDS)
-                  .pollInterval(Duration.ONE_SECOND)
+                  .pollInterval(Duration.ofSeconds(1))
                   .until(new Callable<Boolean>() {
                       @Override
                       public Boolean call() throws Exception {
@@ -127,7 +127,7 @@ public class TestPerTenantConfig extends TestJaxrsBase {
 
         Awaitility.await()
                   .atMost(4, TimeUnit.SECONDS)
-                  .pollInterval(Duration.ONE_SECOND)
+                  .pollInterval(Duration.ofSeconds(1))
                   .until(new Callable<Boolean>() {
                       @Override
                       public Boolean call() throws Exception {

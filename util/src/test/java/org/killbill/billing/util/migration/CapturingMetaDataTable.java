@@ -41,7 +41,7 @@ public class CapturingMetaDataTable extends MetaDataTableImpl {
      * @param table         The metadata table used by flyway.
      */
     public CapturingMetaDataTable(final List<SqlStatement> sqlStatements, final DbSupport dbSupport, final Table table) {
-        super(dbSupport, table);
+        super(dbSupport, table, null);
         this.sqlStatements = sqlStatements;
         this.dbSupport = dbSupport;
         this.table = table;

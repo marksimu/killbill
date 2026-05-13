@@ -58,7 +58,7 @@ public class CapturingSqlMigrationExecutor implements MigrationExecutor {
 
     @Override
     public void execute(final Connection connection) {
-        final SqlScript sqlScript = new SqlScript(dbSupport, sqlScriptResource, placeholderReplacer, encoding);
+        final SqlScript sqlScript = new SqlScript(dbSupport, sqlScriptResource, placeholderReplacer, encoding, true);
         for (final SqlStatement sqlStatement : sqlScript.getSqlStatements()) {
             sqlStatements.add(sqlStatement);
         }
