@@ -70,7 +70,7 @@ public class KillbillJdbcTenantRealm extends JdbcRealm {
 
         // We store the salt bytes in Base64 (because the JdbcRealm retrieves it as a String)
         final ByteSource base64Salt = authenticationInfo.getCredentialsSalt();
-        final byte[] bytes = Base64.decode(base64Salt.getBytes());
+        final byte[] bytes = base64Salt.getBytes();
         // SimpleByteSource isn't Serializable
         authenticationInfo.setCredentialsSalt(new SerializableSimpleByteSource(bytes));
 

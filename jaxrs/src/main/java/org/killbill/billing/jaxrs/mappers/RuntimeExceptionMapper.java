@@ -47,7 +47,7 @@ public class RuntimeExceptionMapper extends ExceptionMapperBase implements Excep
             log.warn("Exception : " + exception.getMessage());
             return buildBadRequestResponse(exception, uriInfo);
         } else if (exception instanceof WebApplicationException) {
-            // e.g. com.sun.jersey.api.NotFoundException
+            // e.g. org.glassfish.jersey.server.model.ModelProcessor$NotFoundException or javax.ws.rs.NotFoundException
             return ((WebApplicationException) exception).getResponse();
         } else {
             return buildInternalErrorResponse(exception, uriInfo);

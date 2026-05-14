@@ -23,7 +23,9 @@ import java.net.URISyntaxException;
 
 import javax.servlet.ServletContext;
 
+import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.message.GZipEncoder;
+import org.glassfish.jersey.server.ServerProperties;
 import org.killbill.billing.jaxrs.resources.JaxRsResourceBase;
 import org.killbill.billing.jaxrs.util.KillbillEventHandler;
 import org.killbill.billing.platform.api.KillbillConfigSource;
@@ -74,11 +76,10 @@ public class KillbillGuiceListener extends KillbillPlatformGuiceListener {
         builder.addJerseyFilter(KillbillMDCInsertingServletFilter.class.getName());
 
         // Disable WADL - it generates noisy log messages, such as:
-        // c.s.j.s.w.g.AbstractWadlGeneratorGrammarGenerator - Couldn't find grammar element for class javax.ws.rs.core.Response
-        builder.addJerseyParam("com.sun.jersey.config.feature.DisableWADL", "true");
+        // AbstractWadlGeneratorGrammarGenerator - Couldn't find grammar element for class javax.ws.rs.core.Response
+        builder.addJerseyParam(ServerProperties.WADL_FEATURE_DISABLE, "true");
 
-        // In order to use the GZIPContentEncodingFilter, the jersey param "com.sun.jersey.config.feature.logging.DisableEntitylogging"
-        // must not be set to false.
+        // When gzip encoding is enabled, avoid forcing entity logging on (would be noisy).
         if (config.isConfiguredToReturnGZIPResponses()) {
             logger.info("Enable http gzip responses");
             builder.addJerseyFilter(GZipEncoder.class.getName());
@@ -94,8 +95,8 @@ public class KillbillGuiceListener extends KillbillPlatformGuiceListener {
             builder.addFilter("/*", TenantFilter.class);
         }
 
-        // Finally, just before the request starts, enable the LoggingFilter
-        builder.addJerseyFilter("com.sun.jersey.api.container.filter.LoggingFilter");
+        // Request/response logging: register LoggingFeature (ServerLoggingFilter has no no-arg ctor since Jersey 2.26+).
+        builder.addJerseyFilter(LoggingFeature.class.getName());
 
         return builder.build();
     }

@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
+import org.glassfish.jersey.logging.LoggingFeature;
 import org.killbill.commons.profiling.ProfilingFeature.ProfilingFeatureType;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -29,8 +30,20 @@ import com.google.common.annotations.VisibleForTesting;
 
 public abstract class Obfuscator {
 
+    /**
+     * Primary JUL logger name for Jersey HTTP message logging when using {@link LoggingFeature} (tests stub this value).
+     * {@link #isJerseyHttpLoggingLogger(String)} also accepts the legacy {@code ServerLoggingFilter} logger name.
+     */
     @VisibleForTesting
-    static final String LOGGING_FILTER_NAME = "com.sun.jersey.api.container.filter.LoggingFilter";
+    static final String LOGGING_FILTER_NAME = LoggingFeature.class.getName();
+
+    private static boolean isJerseyHttpLoggingLogger(@Nullable final String loggerName) {
+        if (loggerName == null) {
+            return false;
+        }
+        return LOGGING_FILTER_NAME.equals(loggerName)
+               || "org.glassfish.jersey.logging.ServerLoggingFilter".equals(loggerName);
+    }
 
     protected static final int DEFAULT_PATTERN_FLAGS = Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL;
 
@@ -74,7 +87,7 @@ public abstract class Obfuscator {
     // filter-out c.s.j.a.c.filter.LoggingFilter because we do want to obfuscate requests (in case sensitive data is passed as
     // query parameters, e.g. in plugin properties)
     private boolean isProfilingHeader(final String confidentialData, final ILoggingEvent event) {
-        if (!LOGGING_FILTER_NAME.equals(event.getLoggerName())) {
+        if (!isJerseyHttpLoggingLogger(event.getLoggerName())) {
             return false;
         }
 
