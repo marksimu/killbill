@@ -24,7 +24,7 @@ import org.testng.annotations.BeforeClass;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Guice;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import com.google.inject.Injector;
 
 public abstract class JaxrsTestSuiteNoDB extends GuicyKillbillTestSuiteNoDB {

@@ -34,7 +34,7 @@ import org.killbill.billing.util.callcontext.UserType;
 import org.killbill.commons.request.Request;
 
 import com.google.common.base.Preconditions;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 
 public class Context {
 
